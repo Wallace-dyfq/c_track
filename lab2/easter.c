@@ -4,9 +4,7 @@ int main() {
   int Y;
   /* given the year for which the date of Easter is to be determined. */
   while(1) {
-    
    
-    /*  printf("Enter the year you want to find the Easter day for, please.\n"); */
     int result; 
     result = scanf("%d", &Y);
     if (result == EOF)
@@ -22,7 +20,7 @@ int main() {
     int X;
     X = 3 * C / 4 - 12;
 
-    /*Z is a correction factor for the moon's orbit. */
+    /* Z is a correction factor for the moon's orbit. */
     int Z;
     Z = (8 * C + 5) / 25 - 5;
 
@@ -50,7 +48,7 @@ int main() {
     if (N > 31)
       printf("%d - April %d\n", Y, N - 31);
     else
-      printf ("%d - March %d\n",Y, N);
+      printf ("%d - March %d\n", Y, N);
   }
   
   return 0;
