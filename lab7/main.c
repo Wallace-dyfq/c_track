@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         usage(argv[0]);
         exit(1);
     }
-
+  printf("hello\n ");
     /* Make the hash table. */
     ht = create_hash_table();
 
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
             add_to_hash_table(ht, new_word);
         }
     }
-
+  
     /* Print out the hash table key/value pairs. */
     print_hash_table(ht);
 
