@@ -13,6 +13,7 @@
  */
 
 /* todo array as pointer could not be index like a[i], use a+i instead  */
+/* be careful when comparing char *. need to use strcmp instead of == */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,6 +74,7 @@ void free_list(node *list)
      while 'list' now points to everythin but the first
     element. Since nothing points to 'n', it can be freed */
     free(n->key);
+    
     free(n);
   }
 
@@ -183,6 +185,7 @@ void set_value(hash_table *ht, char *key, int value)
     {
       tmpnode = tmpnode->next;
     }
+     free(key);
     tmpnode->value = value;
   }
 
