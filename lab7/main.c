@@ -42,10 +42,10 @@ int main(int argc, char **argv)
         usage(argv[0]);
         exit(1);
     }
-  printf("hello\n ");
+  
     /* Make the hash table. */
     ht = create_hash_table();
-
+    /* printf("create hash_table successfully!\n"); */
     /*
      * Open the input file.  For simplicity, we specify that the
      * input file has to contain exactly one word per line.
@@ -86,11 +86,14 @@ int main(int argc, char **argv)
             }
 
             strcpy(new_word, word);
-
+           
+           
             /* Add it to the hash table. */
             add_to_hash_table(ht, new_word);
+           
         }
     }
+
   
     /* Print out the hash table key/value pairs. */
     print_hash_table(ht);

@@ -35,6 +35,7 @@ int hash(char *s)
   int i;
   for(i = 0; i < strlen(s); ++i)
     hashed_value += p[i];
+  
   hashed_value = hashed_value % NSLOTS;
   return hashed_value;
 }
@@ -71,6 +72,7 @@ void free_list(node *list)
     /* 'n' now points to the first element of the list
      while 'list' now points to everythin but the first
     element. Since nothing points to 'n', it can be freed */
+    free(n->key);
     free(n);
   }
 
@@ -82,7 +84,8 @@ void free_list(node *list)
 /* Create a new hash table. */
 hash_table *create_hash_table()
 {
-  hash_table *ht = (hash_table *)malloc(sizeof(hash_table) * NSLOTS);
+  
+  hash_table *ht = (hash_table *)malloc(sizeof(hash_table));
   
   /* check if memory is enough */
   if (ht == NULL) {
@@ -91,11 +94,15 @@ hash_table *create_hash_table()
     exit(1);
   }
   int i;
-  node *tmp = ht->slot;
+  ht->slot = (node * *)malloc(sizeof(node*) * NSLOTS);
+  
+
+  node **tmp = ht->slot;
+
   for(i = 0; i < NSLOTS; ++i)
   {
-    /* printf("%d\n", i); */
-    tmp = NULL;
+    
+    *tmp = NULL;
     tmp ++;
   }
     
@@ -108,15 +115,18 @@ void free_hash_table(hash_table *ht)
 {
   /* free the list in each slot */
   int i ;
-  node *tmp = ht->slot;
+  node **tmp = ht->slot;
   
   for (i = 0; i < NSLOTS; ++i)
   {
-    free_list(tmp);
+    node *tmpnode = *tmp;
     tmp++;
+    free_list(tmpnode);  /* !!! */
+ 
   }
 
   /* free the hash table itself */
+  free(ht->slot);
   free(ht);
 
 }
@@ -129,12 +139,24 @@ void free_hash_table(hash_table *ht)
 int get_value(hash_table *ht, char *key)
 {
   int hashed_value = hash(key);
-  node *tmp = ht->slot + hashed_value;
+  /* printf("%s has hased value %d\n", key, hashed_value); */
+  node *tmp = *(ht->slot + hashed_value);
   while(tmp != NULL)
   {
-    if (tmp->key == key)
-      return tmp->value;
-    tmp = tmp->next;
+   
+   
+    if (strcmp(tmp->key, key) != 0)
+
+    {
+       tmp = tmp->next;
+
+    }
+    else
+    {
+      /* printf("%s has value: %d\n", tmpkey, tmp->value); */
+      return tmp->value; 
+    }
+    
   }
   /* not found, return 0 */
   return 0;
@@ -151,20 +173,24 @@ void set_value(hash_table *ht, char *key, int value)
 {
   int key_exist = get_value(ht, key);
   int hashed_value = hash(key);
-  node *tmp = ht->slot + hashed_value;
+  node **tmp =  ht->slot + hashed_value;
   if (key_exist != 0)
   {
     /* need to find the node with the same key */
-    while (tmp->key != key)
-      tmp = tmp->next;
-    tmp->value = value;
+     node *tmpnode = *tmp;
+    /* while (tmpnode->key != key) */
+     while(strcmp(tmpnode->key, key) != 0)
+    {
+      tmpnode = tmpnode->next;
+    }
+    tmpnode->value = value;
   }
 
   else  /* key not exist */
   {     /* create a new node and place in the first of the list */
     node * new_node = create_node(key, value);
-    new_node->next = ht->slot + hashed_value;
-    ( ht->slot + hashed_value) = new_node;
+    new_node->next = *(ht->slot + hashed_value);
+    *( ht->slot + hashed_value) = new_node;
   }
 
 }
@@ -174,11 +200,14 @@ void set_value(hash_table *ht, char *key, int value)
 void print_hash_table(hash_table *ht)
 {
   int i;
+ 
   node *cur;
   for(i = 0; i < NSLOTS; ++i)
-  { cur = ht->slot + i;
-    while(cur != NULL)
-      printf("s% %d\n", cur->key, cur->value);
+  { cur = *(ht->slot + i);
+    while(cur != NULL){
+      printf("%s %d\n", cur->key, cur->value);
+      cur = cur->next;
+    }
   }
 }
 
