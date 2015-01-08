@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 
 """
 bca: an assembler for the VM byte-code.  It converts files written in the

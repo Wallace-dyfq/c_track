@@ -18,7 +18,7 @@ test:
 	./run_test
 
 check:
-	c_style_check bci.c
+	./c_style_check bci.c
 
 clean:
 	rm -f *.o bci 

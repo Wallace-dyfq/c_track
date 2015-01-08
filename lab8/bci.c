@@ -63,8 +63,8 @@ void init_vm(void)
  * 1) This function moves 'vm.ip' past the integer's location
  *    in memory.
  * 2) This function assumes that integers take up 4 bytes and are
- *    arranged in a little-endian order (low-order bytes at the
- *    beginning).  This should hold for any pentium-based microprocessor.
+ *    arranged in a little endian order (low - order bytes at the
+ *    beginning).  This should hold for any pentium based microprocessor.
  * 3) This function only works for n = 1, 2, or 4 bytes.
  *
  */
@@ -97,62 +97,129 @@ int read_n_byte_integer(int n)
 
 void do_push(int n)
 {
-/* TODO */
+/* Done */
+  assert(vm.sp < STACK_SIZE);
+  vm.stack[vm.sp] = n;
+  vm.sp++;
 }
 
 void do_pop(void)
 {
-/* TODO */
+/* Done */
+  assert(vm.sp > 1);
+  vm.sp--;
 }
 
-void do_load(int n)
+void do_load(int n)  /* assume n means register <r>,
+                        instead of the value in it */
 {
-/* TODO */
+/* Done */
+  int val = vm.reg[n];
+  vm.stack[vm.sp] = val;
+  vm.sp++;
+  
 }
 
-void do_store(int n)
+void do_store(int n)  /* assme n is the register location */
 {
-/* TODO */
+/* Done */
+  assert(n < NREGS);
+  int val = vm.stack[vm.sp - 1];
+  vm.sp--;
+  vm.reg[n] = val;  
 }
 
 void do_jmp(int n)
 {
-/* TODO */
+/* Done */
+  assert(n < MAX_INSTS);
+  vm.ip = n;
 }
 
 void do_jz(int n)
 {
-/* TODO */
+/* Done */
+  assert(vm.sp > 0);
+  int val = vm.stack[vm.sp - 1];
+  if (val == 0)
+  {
+    vm.sp--;
+    vm.ip = n;    
+  }
+  else
+  {
+    vm.sp--;
+  }
 }
 
 void do_jnz(int n)
 {
-/* TODO */
+  /* Done */
+  assert(vm.sp > 0);
+  int val = vm.stack[vm.sp - 1];
+  if (val != 0)
+  {
+    vm.sp--;
+    vm.ip = n;    
+  }
+  else
+  {
+    vm.sp--;
+  }
 }
-
 void do_add(void)
 {
-/* TODO */
+  /* Done */
+  assert(vm.sp > 1);
+  int s1 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int s2 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int sum = s1 + s2;
+  do_push(sum);  
 }
 
 void do_sub(void)
 {
-/* TODO */
+  /* Done */
+  assert(vm.sp > 1);
+  int s1 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int s2 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int diff = s2 - s1;
+  do_push(diff);  
 }
 
 void do_mul(void)
 {
-/* TODO */
+/* Done */
+  assert(vm.sp > 1);
+  int s1 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int s2 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int mul = s2 * s1;
+  do_push(mul);  
 }
-
 void do_div(void)
 {
-/* TODO */
+/* Done */
+  assert(vm.sp > 1);
+  int s1 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int s2 = vm.stack[vm.sp - 1];
+  vm.sp--;
+  int div = s2 / s1;
+  do_push(div);  
 }
 
 void do_print(void)
 {
-/* TODO */
+  /* Done */
+  int val = vm.stack[vm.sp - 1];
+  vm.sp--;
+  printf("%d\n", val);
 }
 
 
@@ -199,63 +266,92 @@ void execute_program(void)
          * instruction.
          */
 
-        switch (vm.inst[vm.ip])
-        {
+      switch (vm.inst[vm.ip])
+      {
         case NOP:
-            /* Skip to the next instruction. */
-            vm.ip++;
-            break;
+          /* Skip to the next instruction. */
+          vm.ip++;
+          break;
 
         case PUSH:
-            vm.ip++;
+          vm.ip++;
 
-            /* Read in the next 4 bytes. */
-            val = read_n_byte_integer(4);
-            do_push(val);
-            break;
+          /* Read in the next 4 bytes. */
+          val = read_n_byte_integer(4);
+          do_push(val);
+          break;
 
         case POP:
-            /* TODO */
+          /* Done */
+          vm.ip++;
+          do_pop();
+          break;
 
         case LOAD:
-            vm.ip++;
+          vm.ip++;
 
-            /* Read in the next byte. */
-            val = read_n_byte_integer(1);
-            do_load(val);
-            break;
+          /* Read in the next byte. */
+          val = read_n_byte_integer(1);
+          do_load(val);
+          break;
 
         case STORE:
-            /* TODO */
-
+          /* Done */
+          /* STORE <r> means to store the TOS to register <r> and pop the TOS.
+             Again, <r> is a one byte unsigned integer. */
+          vm.ip++;
+          unsigned char r = read_n_byte_integer(1);
+          do_store(r);
+          break;
         case JMP:
-            vm.ip++;
+          vm.ip++;
 
-            /* Read in the next two bytes. */
-            val = read_n_byte_integer(2);
-            do_jmp(val);
-            break;
+          /* Read in the next two bytes. */
+          val = read_n_byte_integer(2);
+          do_jmp(val);
+          break;
 
         case JZ:
-            /* TODO */
+          /* Done */
+          vm.ip++;
+          val = read_n_byte_integer(2);
+          do_jz(val);
+          break;
 
         case JNZ:
-            /* TODO */
+          /* Done */
+          vm.ip++;
+          val = read_n_byte_integer(2);
+          do_jnz(val);
+          break;
 
         case ADD:
-            /* TODO */
-
+          /* Done */
+          vm.ip++;
+          do_add();
+          break;
         case SUB:
-            /* TODO */
-
+          /* Done */
+          vm.ip++;
+          do_sub();
+          break;
         case MUL:
-            /* TODO */
+          /* Done */
+          vm.ip++;
+          do_mul();
+          break;
 
         case DIV:
-            /* TODO */
+            /* Done */
+          vm.ip++;
+          do_div();
+          break;
 
         case PRINT:
-            /* TODO */
+            /* Done */
+          vm.ip++;
+          do_print();
+          break;
 
         case STOP:
             return;
